@@ -59,21 +59,21 @@ function parseArgumentsIntoOptions(rawArgs) {
         rl.question('Digite o nome do arquivo: ', (answer) => {
             try{
                 if(options.file == 'View'){
-                    fs.mkdirSync('views');
-                    fs.mkdirSync('views/'+answer);
-                    fs.appendFile('./views/'+answer+'/index.tsx', '', function (err) {
+                    fs.mkdirSync('./src/views');
+                    fs.mkdirSync('./src/views/'+answer);
+                    fs.appendFile('./src/views/'+answer+'/index.tsx', '', function (err) {
                         if (err) throw err;
                         console.log(options.file+' criado com sucesso!');
                       });
-                    fs.appendFile('./views/'+answer+'/style.js', '', function (err) {
+                    fs.appendFile('./src/views/'+answer+'/style.js', '', function (err) {
                         if (err) throw err;
                         
                       });             
                     
                 }
                 if(options.file == 'Service'){
-                    fs.mkdirSync('services');
-                    fs.appendFile('./services/'+answer+'.js', '', function (err) {
+                    fs.mkdirSync('./src/services');
+                    fs.appendFile('./src/services/'+answer+'.js', '', function (err) {
                         if (err) throw err;
                         console.log(options.file+' criado com sucesso!');
                       });
@@ -81,12 +81,12 @@ function parseArgumentsIntoOptions(rawArgs) {
             }catch(e){
                 if(options.file == 'View'){
                     try{
-                        fs.mkdirSync('views/'+answer);
-                        fs.appendFile('./views/'+answer+'/index.tsx', '', function (err) {
+                        fs.mkdirSync('./src/views/'+answer);
+                        fs.appendFile('./src/views/'+answer+'/index.tsx', '', function (err) {
                             if (err) throw err;
                             console.log(options.file+' criado com sucesso!');
                         });
-                        fs.appendFile('./views/'+answer+'/style.js', '', function (err) {
+                        fs.appendFile('./src/views/'+answer+'/style.js', '', function (err) {
                             if (err) throw err;
                             
                         });
@@ -97,7 +97,7 @@ function parseArgumentsIntoOptions(rawArgs) {
                 }
                 if(options.file == 'Service'){
                     
-                            fs.appendFile('./services/'+answer+'.js', '', function (err) {
+                            fs.appendFile('./src/services/'+answer+'.js', '', function (err) {
                             if (err) throw err;
                             console.log(options.file+' criado com sucesso!');
                       });

@@ -1,6 +1,6 @@
 {
   "name": "@gust142/react-archetype",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "CLI para Views e Services para o React Archetype",
   "main": "index.js",
   "bin": {
