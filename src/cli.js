@@ -1,6 +1,7 @@
 import arg from 'arg';
 import inquirer from 'inquirer';
 import fs from 'fs';
+import readline from 'readline';
 function parseArgumentsIntoOptions(rawArgs) {
     const args = arg(
       {
@@ -50,19 +51,64 @@ function parseArgumentsIntoOptions(rawArgs) {
 
    }
    function createFile(options){
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        
+        rl.question('Digite o nome do arquivo: ', (answer) => {
+            try{
+                if(options.file == 'View'){
+                    fs.mkdirSync('views');
+                    fs.mkdirSync('views/'+answer);
+                    fs.appendFile('./views/'+answer+'/index.tsx', '', function (err) {
+                        if (err) throw err;
+                        console.log(options.file+' criado com sucesso!');
+                      });
+                    fs.appendFile('./views/'+answer+'/style.js', '', function (err) {
+                        if (err) throw err;
+                        
+                      });             
+                    
+                }
+                if(options.file == 'Service'){
+                    fs.mkdirSync('services');
+                    fs.appendFile('./services/'+answer+'.js', '', function (err) {
+                        if (err) throw err;
+                        console.log(options.file+' criado com sucesso!');
+                      });
+                }
+            }catch(e){
+                if(options.file == 'View'){
+                    try{
+                        fs.mkdirSync('views/'+answer);
+                        fs.appendFile('./views/'+answer+'/index.tsx', '', function (err) {
+                            if (err) throw err;
+                            console.log(options.file+' criado com sucesso!');
+                        });
+                        fs.appendFile('./views/'+answer+'/style.js', '', function (err) {
+                            if (err) throw err;
+                            
+                        });
+                    }catch(ee){
+                        console.log('Erro ao criar arquivo, o mesmo já se encontra existente')                        
+                    }
+
+                }
+                if(options.file == 'Service'){
+                    
+                            fs.appendFile('./services/'+answer+'.js', '', function (err) {
+                            if (err) throw err;
+                            console.log(options.file+' criado com sucesso!');
+                      });
+                     
+                }
+                
+            }
+            rl.close();
+        });
        
-        try{
-            if(options.file == 'View'){
-                fs.mkdirSync('views');
-    
-            }
-            if(options.file == 'Service'){
-                fs.mkdirSync('services');
-            }
-        }catch(e){
-            
-            
-        }
+        
    }
    
    export async function cli(args) {
