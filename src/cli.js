@@ -2,6 +2,8 @@ import arg from 'arg';
 import inquirer from 'inquirer';
 import fs from 'fs';
 import readline from 'readline';
+import figlet from 'figlet';
+
 function parseArgumentsIntoOptions(rawArgs) {
     const args = arg(
       {
@@ -9,7 +11,8 @@ function parseArgumentsIntoOptions(rawArgs) {
         '--create':Boolean,
         '--help':Boolean,
         '-C': '--create',
-        '-H':'--help'
+        '-H':'--help',
+        
       },
       {
         argv: rawArgs.slice(2),
@@ -28,8 +31,7 @@ function parseArgumentsIntoOptions(rawArgs) {
         // console.log(options)
         const defaultFile = 'Service';
         if(options.help){
-            console.log('ARCHETYPE PULSE');
-            console.log('--create, -C => Criar arquivos no projeto (Views, Services)');
+
             return options
         }
         const questions = [];
@@ -51,6 +53,11 @@ function parseArgumentsIntoOptions(rawArgs) {
 
    }
    function createFile(options){
+        // console.log(options);
+        if((options.create == false && options.help == false)||options.help == true){
+            ascii('PULSE CLI');
+            return null;
+        }
         const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout
@@ -61,11 +68,11 @@ function parseArgumentsIntoOptions(rawArgs) {
                 if(options.file == 'View'){
                     fs.mkdirSync('./src/views');
                     fs.mkdirSync('./src/views/'+answer);
-                    fs.appendFile('./src/views/'+answer+'/index.tsx', '', function (err) {
+                    fs.appendFile('./src/views/'+answer+'/index.tsx', fs.readFileSync('./src/templates/view.txt').toString(), function (err) {
                         if (err) throw err;
                         console.log(options.file+' criado com sucesso!');
                       });
-                    fs.appendFile('./src/views/'+answer+'/style.js', '', function (err) {
+                    fs.appendFile('./src/views/'+answer+'/style.js', fs.readFileSync('./src/templates/styles.txt').toString(), function (err) {
                         if (err) throw err;
                         
                       });             
@@ -73,7 +80,7 @@ function parseArgumentsIntoOptions(rawArgs) {
                 }
                 if(options.file == 'Service'){
                     fs.mkdirSync('./src/services');
-                    fs.appendFile('./src/services/'+answer+'.js', '', function (err) {
+                    fs.appendFile('./src/services/'+answer+'.js', fs.readFileSync('./src/templates/service.txt').toString(), function (err) {
                         if (err) throw err;
                         console.log(options.file+' criado com sucesso!');
                       });
@@ -82,11 +89,11 @@ function parseArgumentsIntoOptions(rawArgs) {
                 if(options.file == 'View'){
                     try{
                         fs.mkdirSync('./src/views/'+answer);
-                        fs.appendFile('./src/views/'+answer+'/index.tsx', '', function (err) {
+                        fs.appendFile('./src/views/'+answer+'/index.tsx', fs.readFileSync('./src/templates/view.txt').toString(), function (err) {
                             if (err) throw err;
                             console.log(options.file+' criado com sucesso!');
                         });
-                        fs.appendFile('./src/views/'+answer+'/style.js', '', function (err) {
+                        fs.appendFile('./src/views/'+answer+'/style.js', fs.readFileSync('./src/templates/styles.txt').toString(), function (err) {
                             if (err) throw err;
                             
                         });
@@ -97,7 +104,7 @@ function parseArgumentsIntoOptions(rawArgs) {
                 }
                 if(options.file == 'Service'){
                     
-                            fs.appendFile('./src/services/'+answer+'.js', '', function (err) {
+                            fs.appendFile('./src/services/'+answer+'.js',  fs.readFileSync('./src/templates/service.txt').toString(), function (err) {
                             if (err) throw err;
                             console.log(options.file+' criado com sucesso!');
                       });
@@ -110,10 +117,28 @@ function parseArgumentsIntoOptions(rawArgs) {
        
         
    }
+
+   function ascii(text){
+    figlet(text, function(err, data) {
+        if (err) {
+            console.log('Something went wrong...');
+            console.dir(err);
+            return;
+        }
+        console.log(data)
+        console.log('LISTA DE COMANDOS')
+        console.log('(--create ou -C) ----------------- Criar arquivos no projeto (Views, Services)');
+    });
+   }
    
    export async function cli(args) {
-    let options = parseArgumentsIntoOptions(args);
-    options = await promptForMissingOptions(options);
-    createFile(options);
-    
+    try{
+        let options = parseArgumentsIntoOptions(args);
+        options = await promptForMissingOptions(options);
+        createFile(options);
+    }catch(e){
+        if(e.code == 'ARG_UNKNOWN_OPTION'){
+            console.log('Argumento não encontrado, use --help para consultar a lista de comandos')
+        }
+    }
    }

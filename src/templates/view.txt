@@ -1,0 +1,30 @@
+import React from 'react';
+import { Box,Button } from '@material-ui/core'
+import { Container } from './styles';
+
+class Page extends React.Component{
+      exempleMethod(){
+            
+            
+      }
+
+    render(){
+        return (
+        <>
+        <Container>
+            <Box overflow="auto" width="1" height="1">
+                            <Box id="title">
+                                <div>
+                                  <Button href="#" onClick={this.exampleMethod} id="botao" size="large" color="primary">Teste</Button>
+                                </div>                               
+                            </Box>
+            </Box>
+        </Container>
+
+
+        </>
+        );
+    }
+}
+
+export default Page;

@@ -1,0 +1,7 @@
+import { httpUrl } from '../plugins/http';
+
+export default {
+    testEndpoint: () => {
+        return httpUrl.get('url');
+    }
+}

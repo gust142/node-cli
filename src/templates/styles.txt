@@ -1,0 +1,13 @@
+import styled from 'styled-components'
+
+export const Container = styled.div`
+    #botao{
+      margin:10px ;  
+      background-color:white;
+      color:black;
+      font-weight:bold;
+      width:20%;
+      
+    }
+
+`
