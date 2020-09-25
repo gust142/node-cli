@@ -3,17 +3,24 @@ import inquirer from 'inquirer';
 import fs from 'fs';
 import readline from 'readline';
 import figlet from 'figlet';
-import base from 'nodejs-base64'
+import base from 'nodejs-base64';
+import childProcess from  'child_process';
+
 const service  = 'aW1wb3J0IHsgaHR0cFVybCB9IGZyb20gJy4uL3BsdWdpbnMvaHR0cCc7DQoNCmV4cG9ydCBkZWZhdWx0IHsNCiAgICB0ZXN0RW5kcG9pbnQ6ICgpID0+IHsNCiAgICAgICAgcmV0dXJuIGh0dHBVcmwuZ2V0KCd1cmwnKTsNCiAgICB9DQp9'
 const styles = 'aW1wb3J0IHN0eWxlZCBmcm9tICdzdHlsZWQtY29tcG9uZW50cycNCg0KZXhwb3J0IGNvbnN0IENvbnRhaW5lciA9IHN0eWxlZC5kaXZgDQogICAgI2JvdGFvew0KICAgICAgbWFyZ2luOjEwcHggOyAgDQogICAgICBiYWNrZ3JvdW5kLWNvbG9yOndoaXRlOw0KICAgICAgY29sb3I6YmxhY2s7DQogICAgICBmb250LXdlaWdodDpib2xkOw0KICAgICAgd2lkdGg6MjAlOw0KICAgICAgDQogICAgfQ0KDQpg'
 const view = 'aW1wb3J0IFJlYWN0IGZyb20gJ3JlYWN0JzsNCmltcG9ydCB7IEJveCxCdXR0b24gfSBmcm9tICdAbWF0ZXJpYWwtdWkvY29yZScNCmltcG9ydCB7IENvbnRhaW5lciB9IGZyb20gJy4vc3R5bGUnOw0KDQpjbGFzcyBQYWdlIGV4dGVuZHMgUmVhY3QuQ29tcG9uZW50ew0KICAgIGV4YW1wbGVNZXRob2QoKXsNCiAgICAgICAgICAgIA0KICAgICAgICAgICAgDQogICAgICB9DQoNCiAgICByZW5kZXIoKXsNCiAgICAgICAgcmV0dXJuICgNCiAgICAgICAgPD4NCiAgICAgICAgPENvbnRhaW5lcj4NCiAgICAgICAgICAgIDxCb3ggb3ZlcmZsb3c9ImF1dG8iIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCb3ggaWQ9InRpdGxlIj4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdj4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8QnV0dG9uIGhyZWY9IiMiIG9uQ2xpY2s9e3RoaXMuZXhhbXBsZU1ldGhvZH0gaWQ9ImJvdGFvIiBzaXplPSJsYXJnZSIgY29sb3I9InByaW1hcnkiPlRlc3RlPC9CdXR0b24+DQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICANCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L0JveD4NCiAgICAgICAgICAgIDwvQm94Pg0KICAgICAgICA8L0NvbnRhaW5lcj4NCg0KDQogICAgICAgIDwvPg0KICAgICAgICApOw0KICAgIH0NCn0NCg0KZXhwb3J0IGRlZmF1bHQgUGFnZTsNCg=='
+const reactRepository = 'git clone https://github.com/gust142/modelo-projeto-reactjs.git';
+const vueRepository  = '';
+const angularRepository = '';
 
 function parseArgumentsIntoOptions(rawArgs) {
     const args = arg(
       {
         
         '--create':Boolean,
+        '--start':Boolean,
         '--help':Boolean,
+        '-S':'--start',
         '-C': '--create',
         '-H':'--help',
         
@@ -28,6 +35,7 @@ function parseArgumentsIntoOptions(rawArgs) {
     return {
         create:args['--create']||false,
         help:args['--help']||false,
+        start:args['--start']||false
     };
    }
 
@@ -37,6 +45,9 @@ function parseArgumentsIntoOptions(rawArgs) {
         if(options.help){
 
             return options
+        }
+        if(options.start){
+            return createArchetype(options);
         }
         const questions = [];
         if(options.create){
@@ -58,9 +69,14 @@ function parseArgumentsIntoOptions(rawArgs) {
    }
    function createFile(options){
         // console.log(options);
-        if((options.create == false && options.help == false)||options.help == true){
+        if((!options.create && !options.help && !options.start)||options.help){
             ascii('PULSE CLI');
             return null;
+        }
+        if(options.start){
+            
+            cloneRepository(options);
+            return null
         }
         const rl = readline.createInterface({
             input: process.stdin,
@@ -110,10 +126,61 @@ function parseArgumentsIntoOptions(rawArgs) {
             return;
         }
         console.log(data)
-        console.log('\x1b[32m','LISTA DE COMANDOS')
+        console.log('\x1b[32m','LISTA DE COMANDOS');
+        console.log('\x1b[32m','(--start ou -S) ----------------- Gerar Modelo de projeto (Vue, React, Angular)');
         console.log('\x1b[32m','(--create ou -C) ----------------- Criar arquivos no projeto (Views, Services)');
     });
    }
+
+
+   async function createArchetype(options){
+        const defaultFile = 'VueJS';
+        
+        const questions = [];
+        if(options.start){
+            questions.push({
+                type: 'list',
+                name: 'type',
+                message: 'Qual tipo de projeto deseja criar?',
+                choices: ['VueJS','React','Angular'],
+                default: defaultFile,
+            });
+        }
+        const answers = await inquirer.prompt(questions);
+
+        return {
+            ...options,
+            type: options.type || answers.type,
+        };
+
+   }
+
+   async function cloneRepository(options){
+    var url  = '';
+    if(options.type == 'React'){
+        url = reactRepository;
+    }else if(options.type == 'VueJS'){
+        url = vueRepository;
+    }else if(options.type == 'Angular'){
+        url = angularRepository;
+    }
+    childProcess.exec(url, (error, stdout, stderr) => {
+        if (error) {
+            console.log(`error: ${error.message}`);
+            return
+        }
+        if (stderr) {
+            console.log('\x1b[32m',`${stderr}`);
+            console.log('\x1b[32m','Modelo de Projeto criado!');
+        }
+        if(stdout){
+            console.log(stdout)
+        }
+        
+    });
+
+   }
+
    
    export async function cli(args) {
     try{
