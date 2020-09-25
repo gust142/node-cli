@@ -71,58 +71,32 @@ function parseArgumentsIntoOptions(rawArgs) {
         }
         
         rl.question('Digite o nome do arquivo: ', (answer) => {
-            try{
                 if(options.file == 'View'){
                     
-                    fs.mkdirSync('./src/views');
-                    fs.mkdirSync('./src/views/'+answer);
-                    fs.appendFile('./src/views/'+answer+'/index.tsx',base.base64decode(view), function (err) {
-                        if (err) throw err;
-                        console.log('\x1b[32m',options.file+' criado com sucesso!');
-                      });
-                    fs.appendFile('./src/views/'+answer+'/style.js', base.base64decode(styles), function (err) {
-                        if (err) throw err;
-                        
-                      });             
-                    
+                    !fs.existsSync('./src/views')?fs.mkdirSync('./src/views'):'';
+                   try{
+                            fs.mkdirSync('./src/views/'+answer);
+                            fs.appendFile('./src/views/'+answer+'/index.tsx',base.base64decode(view), function (err) {
+                                if (err) throw err;
+                                console.log('\x1b[32m',options.file+' criado com sucesso!');
+                            });
+                            fs.appendFile('./src/views/'+answer+'/style.js', base.base64decode(styles), function (err) {
+                                if (err) throw err;
+                                
+                            });    
+                   }catch(e){
+                        console.log('\x1b[31m', 'Erro ao criar arquivo, o mesmo já se encontra existente');
+                                 
+                        }        
                 }
                 if(options.file == 'Service'){
-                    fs.mkdirSync('./src/services');
+                    !fs.existsSync('./src/services')?fs.mkdirSync('./src/services'):'';
                     fs.appendFile('./src/services/'+answer+'.js', base.base64decode(service), function (err) {
                         if (err) throw err;
                         console.log('\x1b[32m',options.file+' criado com sucesso!');
                       });
                 }
-            }catch(e){
-                if(options.file == 'View'){
-                    try{
-                        fs.mkdirSync('./src/views/'+answer);
-                        fs.appendFile('./src/views/'+answer+'/index.tsx', base.base64decode(view), function (err) {
-                            if (err) throw err;
-                            console.log('\x1b[32m',options.file+' criado com sucesso!');
-                        });
-                        fs.appendFile('./src/views/'+answer+'/style.js', base.base64decode(styles), function (err) {
-                            if (err) throw err;
-                            
-                        });
-                    }catch(ee){
-                        
-                        console.log('\x1b[31m', 'Erro ao criar arquivo, o mesmo já se encontra existente');
-                                 
-                    }
-
-                }
-                if(options.file == 'Service'){
-                    
-                            fs.appendFile('./src/services/'+answer+'.js',  base.base64decode(service), function (err) {
-                            if (err) throw err;
-                            console.log('\x1b[32m',options.file+' criado com sucesso!');
-                      });
-                     
-                }
-                
-            }
-            rl.close();
+                 rl.close();
         });
        
         
@@ -142,8 +116,6 @@ function parseArgumentsIntoOptions(rawArgs) {
    }
    
    export async function cli(args) {
-    
-   
     try{
         let options = parseArgumentsIntoOptions(args);
         options = await promptForMissingOptions(options);
